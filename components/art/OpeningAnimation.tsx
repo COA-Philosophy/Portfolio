@@ -191,9 +191,83 @@ export function OpeningAnimation({ onComplete }: OpeningAnimationProps) {
                 }
             }
 
-            // ... (keep updatePhase)
+            updatePhase() {
+                const elapsed = Date.now() - this.phaseStartTime;
+                const currentDuration = this.PHASE_DURATIONS[this.animationPhase];
 
-            // ... (inside updateAndDrawConnections)
+                if (elapsed >= currentDuration) {
+                    this.phaseStartTime = Date.now();
+                    switch (this.animationPhase) {
+                        case 'constellation':
+                            this.animationPhase = 'convergence';
+                            break;
+                        case 'convergence':
+                            this.animationPhase = 'line';
+                            this.lineAnimation.active = true;
+                            this.lineAnimation.startTime = Date.now();
+                            break;
+                        case 'line':
+                            this.animationPhase = 'fade';
+                            this.whiteOverlay.active = true;
+                            break;
+                        case 'fade':
+                            if (CONFIG.loop) {
+                                this.animationPhase = 'wait';
+                            } else {
+                                // Animation Sequence Complete
+                                cancelAnimationFrame(this.animationFrameId);
+                                onComplete();
+                            }
+                            break;
+                        case 'wait':
+                            this.resetAnimation();
+                            break;
+                    }
+                }
+            }
+
+            resetAnimation() {
+                this.animationPhase = 'constellation';
+                this.lineAnimation.active = false;
+                this.whiteOverlay.active = false;
+                this.activeConnections.clear();
+                this.particles.forEach(p => p.reset());
+                this.phaseStartTime = Date.now();
+            }
+
+            animate() {
+                this.ctx.fillStyle = '#000000';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.updatePhase();
+
+                const elapsed = Date.now() - this.phaseStartTime;
+                const duration = this.PHASE_DURATIONS[this.animationPhase];
+                const progress = Math.min(elapsed / duration, 1);
+
+                this.particles.forEach(p => p.update(this.animationPhase, progress));
+
+                if (this.animationPhase === 'constellation') {
+                    this.updateAndDrawConnections();
+                }
+
+                this.ctx.globalCompositeOperation = 'lighter';
+                this.particles.forEach(p => p.draw(this.ctx, this.animationPhase, progress));
+                this.ctx.globalCompositeOperation = 'source-over';
+
+                if (this.lineAnimation.active) {
+                    this.drawLine(progress);
+                }
+
+                if (this.whiteOverlay.active) {
+                    this.drawWhiteOverlay(progress);
+                }
+
+                // Check if we should continue animating
+                if (this.animationPhase !== 'fade' || progress < 1 || CONFIG.loop) {
+                    this.animationFrameId = requestAnimationFrame(() => this.animate());
+                }
+            }
             updateAndDrawConnections() {
                 this.activeConnections.clear();
                 this.ctx.strokeStyle = 'rgba(180, 220, 255, 0.4)';
