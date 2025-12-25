@@ -4,6 +4,7 @@ import { motion } from "framer-motion"
 import { ArrowDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { CodeBackground } from "@/components/art/CodeBackground"
+import Link from "next/link"
 
 export function Hero() {
     return (
@@ -44,14 +45,18 @@ export function Hero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.8 }}
-                    className="flex flex-col sm:flex-row gap-4"
+                    className="flex flex-col sm:flex-row gap-4 justify-center items-center"
                 >
-                    <Button size="lg" className="h-12 px-8 text-base">
-                        Check My Work
-                    </Button>
-                    <Button size="lg" variant="outline" className="h-12 px-8 text-base">
-                        Contact Me
-                    </Button>
+                    <a href="#works">
+                        <Button variant="outline" size="lg" className="min-w-[150px] h-12 text-base backdrop-blur-sm bg-background/50">
+                            Check My Work
+                        </Button>
+                    </a>
+                    <a href="#contact">
+                        <Button size="lg" className="min-w-[150px] h-12 text-base">
+                            Contact Me
+                        </Button>
+                    </a>
                 </motion.div>
             </div>
 
