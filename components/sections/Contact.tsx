@@ -18,6 +18,12 @@ export function Contact() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
+                        <div className="mb-8 p-4 bg-muted/50 rounded-lg text-sm space-y-2">
+                            <p className="font-semibold">嶺岸 達矢 | MINEGISHI TATSUYA</p>
+                            <p>株式会社Ligatis (Ligatis Inc.)</p>
+                            <p>〒104-0061 東京都中央区銀座6-13-16 Ginza Wallビル501</p>
+                            <a href="mailto:minegishi@structure-designer.com" className="text-primary hover:underline">minegishi@structure-designer.com</a>
+                        </div>
                         <form className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="space-y-2">
