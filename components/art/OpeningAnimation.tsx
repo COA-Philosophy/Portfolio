@@ -181,102 +181,36 @@ export function OpeningAnimation({ onComplete }: OpeningAnimationProps) {
             initParticles() {
                 this.particles = [];
                 this.activeConnections.clear();
-                for (let i = 0; i < CONFIG.particleCount; i++) {
+
+                // Responsive configuration
+                const isMobile = this.canvas.width < 768;
+                const count = isMobile ? 60 : CONFIG.particleCount; // Reduce particles on mobile
+
+                for (let i = 0; i < count; i++) {
                     this.particles.push(new Particle(this.canvas));
                 }
             }
 
-            updatePhase() {
-                const elapsed = Date.now() - this.phaseStartTime;
-                const currentDuration = this.PHASE_DURATIONS[this.animationPhase];
+            // ... (keep updatePhase)
 
-                if (elapsed >= currentDuration) {
-                    this.phaseStartTime = Date.now();
-                    switch (this.animationPhase) {
-                        case 'constellation':
-                            this.animationPhase = 'convergence';
-                            break;
-                        case 'convergence':
-                            this.animationPhase = 'line';
-                            this.lineAnimation.active = true;
-                            this.lineAnimation.startTime = Date.now();
-                            break;
-                        case 'line':
-                            this.animationPhase = 'fade';
-                            this.whiteOverlay.active = true;
-                            break;
-                        case 'fade':
-                            if (CONFIG.loop) {
-                                this.animationPhase = 'wait';
-                            } else {
-                                // Animation Sequence Complete
-                                cancelAnimationFrame(this.animationFrameId);
-                                onComplete();
-                            }
-                            break;
-                        case 'wait':
-                            this.resetAnimation();
-                            break;
-                    }
-                }
-            }
-
-            resetAnimation() {
-                this.animationPhase = 'constellation';
-                this.lineAnimation.active = false;
-                this.whiteOverlay.active = false;
-                this.activeConnections.clear();
-                this.particles.forEach(p => p.reset());
-                this.phaseStartTime = Date.now();
-            }
-
-            animate() {
-                this.ctx.fillStyle = '#000000';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
-                this.updatePhase();
-
-                const elapsed = Date.now() - this.phaseStartTime;
-                const duration = this.PHASE_DURATIONS[this.animationPhase];
-                const progress = Math.min(elapsed / duration, 1);
-
-                this.particles.forEach(p => p.update(this.animationPhase, progress));
-
-                if (this.animationPhase === 'constellation') {
-                    this.updateAndDrawConnections();
-                }
-
-                this.ctx.globalCompositeOperation = 'lighter';
-                this.particles.forEach(p => p.draw(this.ctx, this.animationPhase, progress));
-                this.ctx.globalCompositeOperation = 'source-over';
-
-                if (this.lineAnimation.active) {
-                    this.drawLine(progress);
-                }
-
-                if (this.whiteOverlay.active) {
-                    this.drawWhiteOverlay(progress);
-                }
-
-                // Check if we should continue animating
-                if (this.animationPhase !== 'fade' || progress < 1 || CONFIG.loop) {
-                    this.animationFrameId = requestAnimationFrame(() => this.animate());
-                }
-            }
-
+            // ... (inside updateAndDrawConnections)
             updateAndDrawConnections() {
                 this.activeConnections.clear();
                 this.ctx.strokeStyle = 'rgba(180, 220, 255, 0.4)';
                 this.ctx.lineWidth = 0.5;
                 this.ctx.beginPath();
+
+                const isMobile = this.canvas.width < 768;
+                const connectionDist = isMobile ? 80 : 135; // Shorter connections on mobile
+
                 for (let i = 0; i < this.particles.length; i++) {
                     for (let j = i + 1; j < this.particles.length; j++) {
                         const p1 = this.particles[i];
                         const p2 = this.particles[j];
                         const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
 
-                        if (dist < 135) {
-                            const alpha = (1 - dist / 135) * 0.5;
+                        if (dist < connectionDist) {
+                            const alpha = (1 - dist / connectionDist) * 0.5;
                             this.ctx.strokeStyle = `rgba(180, 220, 255, ${alpha})`;
                             this.ctx.moveTo(p1.x, p1.y);
                             this.ctx.lineTo(p2.x, p2.y);
