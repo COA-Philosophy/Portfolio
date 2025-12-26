@@ -4,9 +4,10 @@ import { ProjectCard } from "@/components/shared/ProjectCard"
 const projects = [
     {
         title: "STRUCTURE DESIGNER",
-        description: "An AI partner that accompanies you in complex fortune-telling and structural analysis. Bridging ancient wisdom with modern tech.",
-        tags: ["Next.js", "OpenAI API", "Tailwind CSS"],
-        link: "#"
+        description: "人間には、不可能な診断。四柱推命・算命学・易学・西洋占星術・数秘術、そして心理学のビッグファイブ理論——6つの体系を同時に計算し、矛盾ごと統合できるのはAIだけ。さらに、あなたとの全対話を解析。言葉のパターンから「本当の構造」を導き出します。",
+        tags: ["Next.js", "Gemini API", "Supabase"],
+        image: "/images/structure-designer.png",
+        link: "/works/structure-designer"
     },
     {
         title: "Superb Bespoke",
